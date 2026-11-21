@@ -1,0 +1,13 @@
+{
+  "appId": "com.karakaplan.kiler",
+  "appName": "Kiler",
+  "webDir": "www",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "force"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#c9a46a"
+    }
+  }
+}
