@@ -1,6 +1,6 @@
 {
   "appId": "com.karakaplan.kiler",
-  "appName": "Kiler",
+  "appName": "Shelfetto",
   "webDir": "www",
   "android": {
     "adjustMarginsForEdgeToEdge": "force"

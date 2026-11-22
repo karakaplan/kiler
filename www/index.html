@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kiler</title>
+<title>Shelfetto</title>
 <style>
 /* VOICE: sakin, işe odaklı; telefonda tek elle kullanılan bir depo defteri
    IDEA: koli etiketi — kraft karton bant, siyah etiket yazısı
@@ -171,7 +171,7 @@ body.compact .chips .alert b{min-width:16px;line-height:16px;font-size:10px}
 <body>
 <header id="hd">
   <div class="top">
-    <h1 id="appName">Kiler</h1><span class="sum" id="sum"></span><span class="sp"></span>
+    <h1 id="appName">Shelfetto</h1><span class="sum" id="sum"></span><span class="sp"></span>
     <button class="icon" id="modeBtn" aria-label="Görünümü değiştir"></button>
     <button class="icon" id="menuBtn" aria-label="Menü"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   </div>
@@ -244,7 +244,7 @@ function migrate(d){
     if(it.added==null)it.added=i;if(!Array.isArray(it.tags))it.tags=[];
     if(!d.sections.includes(it.section))d.sections.push(it.section);
   });
-  if(!d.backup)d.backup={freq:'weekly',last:''};if(!d.tags)d.tags=[];
+  if(!d.backup)d.backup={freq:'weekly',last:''};if(!d.tags)d.tags=[];if(d.appName==='Kiler')d.appName='';
   d.v=5;d.notesV=1;return d;
 }
 function load(){try{const r=localStorage.getItem(KEY);if(r){hadLocal=true;const d=JSON.parse(r);if(d&&Array.isArray(d.items))return migrate(d)}}catch(e){}return seed()}
@@ -328,7 +328,7 @@ const COLORS=['#c9a46a','#8a9a5b','#2a9d8f','#4a6fa5','#7b6bb0','#c8553d','#d4a0
 function lum(h){const n=parseInt(h.slice(1),16),r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255;const f=c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4;return .2126*f(r)+.7152*f(g)+.0722*f(b)}
 function applyLook(){const r=document.documentElement.style;const c=S.color;
   if(c){r.setProperty('--kraft',c);r.setProperty('--kraft2',c);r.setProperty('--onk',lum(c)>.35?'#1b1a17':'#ffffff')}else{['--kraft','--kraft2','--onk'].forEach(v=>r.removeProperty(v))}
-  $('#appName').textContent=S.appName||document.title||'Kiler'}
+  $('#appName').textContent=S.appName||document.title||'Shelfetto'}
 
 function pruneFilters(){const L=new Set(S.items.map(i=>i.loc||'')),T=new Set(allTags());[...fLoc].forEach(x=>L.has(x)||fLoc.delete(x));[...fTag].forEach(x=>T.has(x)||fTag.delete(x));[...fCat].forEach(x=>S.sections.includes(x)||fCat.delete(x))}
 function visible(){pruneFilters();
@@ -491,20 +491,20 @@ function csvItems(txt){
       exp:dt(g('e')),war:dt(g('w')),note:[g('u'),g('o')].filter(Boolean).join(' · '),cat:'',type:eq?'Ekipman':'Sarf',tags:g('g')?g('g').split(',').map(x=>x.trim()).filter(Boolean):[],added:now+i}}).filter(Boolean);
 }
 async function writeFile(name,data){
-  try{await FS.writeFile({path:'Download/Kiler/'+name,data,directory:'EXTERNAL_STORAGE',encoding:'utf8',recursive:true});return'İndirilenler › Kiler'}
-  catch(e){await FS.writeFile({path:'Kiler/'+name,data,directory:'DOCUMENTS',encoding:'utf8',recursive:true});return'Belgeler › Kiler'}
+  try{await FS.writeFile({path:'Download/Shelfetto/'+name,data,directory:'EXTERNAL_STORAGE',encoding:'utf8',recursive:true});return'İndirilenler › Shelfetto'}
+  catch(e){await FS.writeFile({path:'Shelfetto/'+name,data,directory:'DOCUMENTS',encoding:'utf8',recursive:true});return'Belgeler › Shelfetto'}
 }
 const stamp=()=>{const d=new Date();return ymd(d)+'_'+pad(d.getHours())+pad(d.getMinutes())};
 async function backupNow(auto){
-  const name=(auto?'kiler-otomatik-':'kiler-yedek-')+stamp()+'.csv';
+  const name=(auto?'shelfetto-otomatik-':'shelfetto-yedek-')+stamp()+'.csv';
   const where=await writeFile(name,toCSV());
   S.backup.last=new Date().toISOString();S.backup.where=where;store();
   if(auto)pruneAuto();
   return where+' › '+name;
 }
-async function pruneAuto(){try{const r=await FS.readdir({path:'Download/Kiler',directory:'EXTERNAL_STORAGE'});
-  const n=(r.files||[]).map(f=>typeof f==='string'?f:f.name).filter(x=>x.startsWith('kiler-otomatik-')).sort();
-  for(const x of n.slice(0,Math.max(0,n.length-6)))await FS.deleteFile({path:'Download/Kiler/'+x,directory:'EXTERNAL_STORAGE'})}catch(e){}}
+async function pruneAuto(){try{const r=await FS.readdir({path:'Download/Shelfetto',directory:'EXTERNAL_STORAGE'});
+  const n=(r.files||[]).map(f=>typeof f==='string'?f:f.name).filter(x=>x.startsWith('shelfetto-otomatik-')).sort();
+  for(const x of n.slice(0,Math.max(0,n.length-6)))await FS.deleteFile({path:'Download/Shelfetto/'+x,directory:'EXTERNAL_STORAGE'})}catch(e){}}
 async function autoBackup(){if(!FS)return;const per={daily:1,weekly:7,monthly:30}[S.backup.freq];if(!per)return;
   const last=S.backup.last?new Date(S.backup.last):null;if(last&&(Date.now()-last)/864e5<per-0.02)return;
   try{await backupNow(true)}catch(e){console.log('yedek',e)}}
@@ -523,7 +523,7 @@ function menuSheet(){
   const used=s=>S.items.some(i=>i.section===s);
   openSheet(head('Menü')+`<div class="menu">
     <section style="border:0;padding:0"><h3>Yedekleme</h3>
-      <p>${isNative?'Yedek, telefonundaki <b>İndirilenler › Kiler</b> klasörüne CSV dosyası olarak kaydedilir. Excel veya Google E-Tablolar ile açılabilir.':'Dosyaya kaydetme telefondaki uygulamada çalışır. Burada (önizlemede) CSV metnini kopyalayabilirsin.'}</p>
+      <p>${isNative?'Yedek, telefonundaki <b>İndirilenler › Shelfetto</b> klasörüne CSV dosyası olarak kaydedilir. Excel veya Google E-Tablolar ile açılabilir.':'Dosyaya kaydetme telefondaki uygulamada çalışır. Burada (önizlemede) CSV metnini kopyalayabilirsin.'}</p>
       <div class="line"><button class="btn pri" data-bk style="flex:none">Şimdi yedekle</button>
         <label class="btn filebtn">Dosyadan yükle<input type="file" id="imf" accept=".csv,text/csv,text/comma-separated-values,application/json,.json,text/plain"></label></div>
       <p style="margin-top:12px">Otomatik yedekleme (uygulama açıldıkça kontrol edilir)</p>
@@ -540,7 +540,7 @@ function menuSheet(){
       <div class="line"><span style="flex:1;font-size:14px">Son kullanma tarihine kaç gün kala</span><input type="number" id="wd" min="1" max="90" value="${S.warn}"></div>
       <div class="line" style="margin-top:8px"><span style="flex:1;font-size:14px">Garanti bitişine kaç gün kala</span><input type="number" id="ww" min="1" max="365" value="${wwarn()}"></div></section>
     <section><h3>Görünüm</h3><p>Uygulama adı</p>
-      <input id="an" class="inp" value="${esc(S.appName||document.title||'Kiler')}">
+      <input id="an" class="inp" value="${esc(S.appName||document.title||'Shelfetto')}">
       <p style="margin-top:10px">Üst bar rengi</p>
       <div class="line" id="sw">${COLORS.map(c=>`<button class="swc" data-c="${c}" aria-label="Renk ${c}" style="background:${c};${(S.color||COLORS[0])===c?'outline:3px solid var(--ink);outline-offset:2px':''}"></button>`).join('')}
         <label class="swc cust" aria-label="Özel renk"><input type="color" id="cc" value="${S.color||COLORS[0]}"></label></div></section>
@@ -564,7 +564,7 @@ function menuSheet(){
     if(b.dataset.delcat){S.sections=S.sections.filter(s=>s!==b.dataset.delcat);if(view===b.dataset.delcat)view='Tümü';store();render();menuSheet();return}
     if(b.hasAttribute('data-addsec')){const v=$('#ns').value.trim();if(v&&!S.sections.includes(v)){S.sections.push(v);store();render();menuSheet();toast('Kategori eklendi')}return}
     if(b.hasAttribute('data-ntest')){try{const r=await LN.requestPermissions();if(r.display!=='granted'){toast('Bildirim izni verilmedi');return}
-      await LN.schedule({notifications:[{id:99999,title:S.appName||'Kiler',body:'Bildirimler çalışıyor 👍',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});toast('5 saniye içinde bildirim gelecek')}catch(err){toast('Bildirim gönderilemedi')}return}
+      await LN.schedule({notifications:[{id:99999,title:S.appName||'Shelfetto',body:'Bildirimler çalışıyor 👍',schedule:{at:new Date(Date.now()+5000),allowWhileIdle:true}}]});toast('5 saniye içinde bildirim gelecek')}catch(err){toast('Bildirim gönderilemedi')}return}
     if(b.dataset.c){S.color=b.dataset.c===COLORS[0]?'':b.dataset.c;store();applyLook();menuSheet();return}
     if(b.hasAttribute('data-reset')){if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Emin misin? Sıfırla';return}S=seed();sel.clear();view='Tümü';save();close();render();toast('Sıfırlandı')}
   };

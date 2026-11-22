@@ -1,6 +1,6 @@
-# Kiler
+# Shelfetto
 
-Depodaki malzemeleri (gıda, araç bakım, tamir/yedek…) takip etmek için kişisel, çevrimdışı çalışan Android uygulaması.
+Shelfetto – Simple Inventory. Depodaki malzemeleri (gıda, araç bakım, tamir/yedek…) takip etmek için kişisel, çevrimdışı çalışan Android uygulaması.
 
 - Veriler sadece telefonda saklanır, internet gerekmez.
 - Son kullanma ve garanti tarihleri yaklaşınca bildirim gönderir.
