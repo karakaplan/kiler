@@ -117,6 +117,19 @@ body.selecting .fab{display:none}
 .rad button.on{background:var(--chip);font-weight:650}
 .rad button span{font-size:13px;color:var(--mute)}
 .hid{display:none!important}
+.tag.lb{background:none;border:1px solid var(--line);color:var(--ink)}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tagrow .tg{display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 4px 0 12px;border-radius:8px;background:var(--chip);color:var(--ink);font-size:14px}
+.tagrow .tg button{border:0;background:none;width:28px;height:28px;color:var(--mute);font-size:16px}
+.tagrow .addt{height:34px;border-radius:8px;border:1px dashed var(--mute);background:none;color:var(--mute);padding:0 12px;font-size:14px}
+.pick{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--bg)}
+.pick input{border:0!important;background:none!important;height:44px}
+.pl{display:grid;max-height:260px;overflow:auto}
+.pl button{display:flex;align-items:center;gap:12px;height:46px;border:0;background:none;text-align:start;padding:0 8px;font-size:16px;color:var(--ink)}
+.pl button .bx{width:20px;height:20px;border:2px solid var(--mute);border-radius:4px;margin-inline-start:auto;flex:none;display:grid;place-items:center}
+.pl button.on .bx{background:var(--kraft2);border-color:var(--kraft2)}
+.pl button.on .bx::after{content:'';width:9px;height:5px;border:2.5px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.pl svg{width:20px;height:20px;flex:none;color:var(--mute)}
 .menu{display:grid;gap:14px}
 .menu section{border-top:1px solid var(--line);padding-top:12px}
 .menu h3{margin:0 0 6px;font-size:15px}
@@ -201,7 +214,7 @@ function seed(){
 ['Pirinç','','Gıda','Kuru gıda','Raf 1',1,'5 kg','Sarf',25,plus(400)],['Konserve nohut','','Gıda','Konserve','Raf 2',4,'400 g','Sarf',100,plus(-3)],
 ['LED ampul E27','Philips','Tamir/yedek','Elektrik','Kutu 3',4,'','Yedek parça',null,''],['Spax vida seti 4×40','Spax','Tamir/yedek','Bağlantı','Kutu 2',1,'200 adet','Yedek parça',50,''],
 ['Sanitär silikon beyaz','','Tamir/yedek','Sızdırmazlık','Kutu 2',1,'300 ml','Sarf',25,plus(60)]];
-  ex.forEach(([n,b,s,c,l,q,a,t,f,e])=>items.push({id:uid(),name:n,brand:b,section:s,cat:c,loc:l,qty:q,amount:a,type:t,fill:f,exp:e,war:'',usage:'',note:'örnek'}));
+  ex.forEach(([n,b,s,c,l,q,a,t,f,e])=>items.push({id:uid(),name:n,brand:b,section:s,cat:c,loc:l,qty:q,amount:a,type:t,fill:f,exp:e,war:'',usage:'',note:'örnek',sample:true}));
   items.forEach(it=>it.usage=kw(it));
   return migrate({v:4,notesV:1,items,sections:['Araç bakım','Gıda','Tamir/yedek'],types:[...TYPES],warn:7});
 }
@@ -213,10 +226,10 @@ function migrate(d){
     if(!d.notesV&&!it.note&&it.section==='Araç bakım'&&NOTES[it.name])it.note=NOTES[it.name];
     if(!(d.v>=4)){if(it.usage==null)it.usage='';if(it.usage&&it.usage===NOTES[it.name]){if(!it.note)it.note=it.usage;it.usage=''}if(!it.usage)it.usage=kw(it)}
     if(!(d.v>=5)){if(it.usage&&!(it.note||'').includes(it.usage))it.note=[it.usage,it.note].filter(Boolean).join(' · ');delete it.usage}
-    if(it.added==null)it.added=i;
+    if(it.added==null)it.added=i;if(!Array.isArray(it.tags))it.tags=[];
     if(!d.sections.includes(it.section))d.sections.push(it.section);
   });
-  if(!d.backup)d.backup={freq:'weekly',last:''};
+  if(!d.backup)d.backup={freq:'weekly',last:''};if(!d.tags)d.tags=[];
   d.v=5;d.notesV=1;return d;
 }
 function load(){try{const r=localStorage.getItem(KEY);if(r){hadLocal=true;const d=JSON.parse(r);if(d&&Array.isArray(d.items))return migrate(d)}}catch(e){}return seed()}
@@ -240,8 +253,12 @@ function scheduleNotes(){if(!LN)return;clearTimeout(ntT);ntT=setTimeout(async()=
 }catch(e){console.log('bildirim',e)}},800)}
 
 /* durum */
+const LBL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h11l5 7-5 7h-11A1.5 1.5 0 0 1 3 17.5z"/></svg>';
+const isSample=it=>!!it.sample||/(^|· )örnek$/.test(it.note||'');
+const allTags=()=>[...new Set([...(S.tags||[]),...S.items.flatMap(i=>i.tags||[])])].sort(cmpTr);
+let sheetBack=null;
 let view='Tümü',q='',lastDel=null,sel=new Set(),visIds=[];
-let sortK='name',sortD=1,fStatus='all',fLoc=new Set(),fCat=new Set();
+let sortK='name',sortD=1,fStatus='all',fLoc=new Set(),fCat=new Set(),fTag=new Set();
 let mode='cards';
 try{const m=localStorage.getItem(KEY+'-mode');if(m==='table'||m==='cards')mode=m;const so=JSON.parse(localStorage.getItem(KEY+'-sort')||'null');if(so){sortK=so.k;sortD=so.d}}catch(e){}
 const remember=()=>{try{localStorage.setItem(KEY+'-mode',mode);localStorage.setItem(KEY+'-sort',JSON.stringify({k:sortK,d:sortD}))}catch(e){}};
@@ -253,7 +270,7 @@ const stOk={all:()=>true,alert:isAlert,
   date:it=>(it.exp&&days(it.exp)<=S.warn)||(it.war&&days(it.war)>=0&&days(it.war)<=wwarn()),
   low:it=>(it.fill!=null&&it.fill<=25)||(it.fill==null&&it.qty===0),dated:it=>!!(it.exp||it.war)};
 const SORTS=[['name','Ada göre','A → Z','Z → A'],['exp','Tarihe göre','En yakın önce','En uzak önce'],['fill','Doluluğa göre','En az önce','En dolu önce'],['loc','Konuma göre','A → Z','Z → A'],['brand','Markaya göre','A → Z','Z → A'],['added','Eklenme sırasına göre','Eskiden yeniye','Yeniden eskiye']];
-const filterCount=()=>(fStatus!=='all'?1:0)+fLoc.size+fCat.size;
+const filterCount=()=>(fStatus!=='all'?1:0)+fLoc.size+fCat.size+fTag.size;
 
 function sortVal(it,k){return k==='fill'?it.fill:k==='exp'?(it.exp||it.war||''):k==='added'?it.added:(it[k]||'')}
 function cmp(a,b){const va=sortVal(a,sortK),vb=sortVal(b,sortK);const ea=va===''||va==null,eb=vb===''||vb==null;
@@ -271,6 +288,7 @@ function tagsHtml(it){
   if(it.fill===0)t.push(['bad','Bitti']);else if(it.fill!=null&&it.fill<=25)t.push(['soon','Az kaldı']);
   if(it.fill==null&&it.qty===0)t.push(['bad','Stok yok']);
   if(it.amount)t.push(['',it.amount]);
+  (it.tags||[]).forEach(x=>t.push(['lb',x]));
   return t.map(([c,l])=>`<span class="tag ${c}">${esc(l)}</span>`).join('');
 }
 function fillHtml(it){
@@ -297,10 +315,11 @@ function applyLook(){const r=document.documentElement.style;const c=S.color;
   if(c){r.setProperty('--kraft',c);r.setProperty('--kraft2',c);r.setProperty('--onk',lum(c)>.35?'#1b1a17':'#ffffff')}else{['--kraft','--kraft2','--onk'].forEach(v=>r.removeProperty(v))}
   $('#appName').textContent=S.appName||document.title||'Kiler'}
 
-function visible(){
+function pruneFilters(){const L=new Set(S.items.map(i=>i.loc||'')),T=new Set(allTags());[...fLoc].forEach(x=>L.has(x)||fLoc.delete(x));[...fTag].forEach(x=>T.has(x)||fTag.delete(x));[...fCat].forEach(x=>S.sections.includes(x)||fCat.delete(x))}
+function visible(){pruneFilters();
   const t=q.toLocaleLowerCase('tr');
   return S.items.filter(it=>(view==='Tümü'||(view==='__alert'?isAlert(it):it.section===view))&&stOk[fStatus](it)&&
-    (!fLoc.size||fLoc.has(it.loc||''))&&(!fCat.size||fCat.has(it.section))&&(!t||[it.name,it.brand,it.loc,it.section,it.note,it.amount].join(' ').toLocaleLowerCase('tr').includes(t))).sort(cmp);
+    (!fLoc.size||fLoc.has(it.loc||''))&&(!fCat.size||fCat.has(it.section))&&(!fTag.size||(it.tags||[]).some(x=>fTag.has(x)))&&(!t||[it.name,it.brand,it.loc,it.section,it.note,it.amount,...(it.tags||[])].join(' ').toLocaleLowerCase('tr').includes(t))).sort(cmp);
 }
 function render(){
   chips();applyLook();
@@ -328,7 +347,7 @@ function render(){
 /* sayfalar (alt pencereler) */
 const ov=$('#ov'),sh=$('#sheet');
 const isOpen=()=>ov.classList.contains('open');
-const openSheet=h=>{sh.innerHTML=h;ov.classList.add('open');sh.scrollTop=0};
+const openSheet=h=>{sheetBack=null;sh.innerHTML=h;ov.classList.add('open');sh.scrollTop=0};
 const close=()=>{ov.classList.remove('open');sh.innerHTML='';sh.onclick=null};
 ov.addEventListener('click',e=>{if(e.target===ov)close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
@@ -350,24 +369,25 @@ function sortSheet(){
 }
 
 function filterSheet(){
-  const locs=[...new Set(S.items.map(i=>i.loc||''))].sort((a,b)=>a===''?1:b===''?-1:cmpTr(a,b));
-  const draw=()=>{openSheet(head('Filtrele')+`<div class="f">
+  const draw=()=>{const locs=[...new Set(S.items.map(i=>i.loc||''))].sort((a,b)=>a===''?1:b===''?-1:cmpTr(a,b));openSheet(head('Filtrele')+`<div class="f">
     <div class="lbl">Durum<div class="rad">${STATUS.map(([k,l])=>`<button data-s="${k}" class="${fStatus===k?'on':''}">${l}<span>${fStatus===k?'✓':''}</span></button>`).join('')}</div></div>
     <div class="lbl">Kategori<div class="opts chk">${S.sections.map(c=>`<button data-c2="${esc(c)}" class="${fCat.has(c)?'on':''}">${esc(c)}</button>`).join('')}</div></div>
+    ${allTags().length?`<div class="lbl">Etiket<div class="opts chk">${allTags().map(t=>`<button data-t2="${esc(t)}" class="${fTag.has(t)?'on':''}">${esc(t)}</button>`).join('')}</div></div>`:''}
     <div class="lbl">Konum<div class="opts chk">${locs.map(l=>`<button data-l="${esc(l)}" class="${fLoc.has(l)?'on':''}">${l?esc(l):'Konumsuz'}</button>`).join('')}</div></div>
     <div class="acts"><button class="btn" data-reset>Temizle</button><button class="btn pri" data-close>Tamam</button></div></div>`);
     sh.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-close'))return close();
       if(b.dataset.s){fStatus=b.dataset.s}
       if(b.dataset.l!=null){const l=b.dataset.l;fLoc.has(l)?fLoc.delete(l):fLoc.add(l)}
       if(b.dataset.c2!=null){const c=b.dataset.c2;fCat.has(c)?fCat.delete(c):fCat.add(c)}
-      if(b.hasAttribute('data-reset')){fStatus='all';fLoc.clear();fCat.clear()}
+      if(b.dataset.t2!=null){const c=b.dataset.t2;fTag.has(c)?fTag.delete(c):fTag.add(c)}
+      if(b.hasAttribute('data-reset')){fStatus='all';fLoc.clear();fCat.clear();fTag.clear()}
       render();draw()}};
   draw();
 }
 
 function editSheet(it){
   const isNew=!it;
-  it=it||{id:uid(),name:'',brand:'',section:S.sections.includes(view)?view:S.sections[0],cat:'',loc:'',qty:null,amount:'',type:'Sarf',fill:100,exp:'',war:'',note:'',added:Date.now()};
+  it=it||{tags:[],id:uid(),name:'',brand:'',section:S.sections.includes(view)?view:S.sections[0],cat:'',loc:'',qty:null,amount:'',type:'Sarf',fill:100,exp:'',war:'',note:'',added:Date.now()};
   const locs=[...new Set(S.items.map(i=>i.loc).filter(Boolean))].sort(cmpTr);
   const brands=[...new Set(S.items.map(i=>i.brand).filter(Boolean))].sort(cmpTr);
   let fill=it.fill??100;const opt={fill:isNew?true:it.fill!=null,qty:isNew?false:it.qty!=null,exp:isNew?it.section==='Gıda':!!it.exp,war:!!it.war};
@@ -384,15 +404,31 @@ function editSheet(it){
     <label id="o-fill" class="${opt.fill?'':'hid'}">Doluluk<div class="seg" id="seg">${[0,25,50,75,100].map(v=>`<button type="button" data-v="${v}" class="${fill===v?'on':''}">%${v}</button>`).join('')}</div></label>
     <label id="o-exp" class="${opt.exp?'':'hid'}">Son kullanma tarihi<input name="exp" type="date" value="${esc(it.exp)}"></label>
     <label id="o-war" class="${opt.war?'':'hid'}">Garanti bitiş tarihi<input name="war" type="date" value="${esc(it.war||'')}"></label>
+    <div class="lbl">Etiketler<div class="tagrow" id="tagrow"></div>
+      <div class="pick hid" id="pick"><input id="tagq" placeholder="Etiket adı gir" autocomplete="off"><div class="pl" id="pl"></div></div></div>
     <label>Not<textarea name="note">${esc(it.note)}</textarea></label>
     <div class="acts">${isNew?'':'<button type="button" class="btn del" data-del>Sil</button>'}<button class="btn pri">Kaydet</button></div>
   </form>
   <datalist id="dl-loc">${locs.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
   <datalist id="dl-brand">${brands.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`);
-  const f=$('#ef');
+  const f=$('#ef');let tags=[...(it.tags||[])];
+  const drawTags=()=>{$('#tagrow').innerHTML=tags.map(t=>`<span class="tg">${esc(t)}<button type="button" data-rmtag="${esc(t)}" aria-label="${esc(t)} kaldır">×</button></span>`).join('')+`<button type="button" class="addt" data-addtag>+ Etiket</button>`};
+  const drawPick=()=>{const qv=$('#tagq').value.trim(),ql=qv.toLocaleLowerCase('tr');const all=[...new Set([...allTags(),...tags])].sort(cmpTr);
+    const list=all.filter(t=>!ql||t.toLocaleLowerCase('tr').includes(ql));const exact=all.some(t=>t.toLocaleLowerCase('tr')===ql);
+    $('#pl').innerHTML=(qv&&!exact?`<button type="button" data-newtag="${esc(qv)}"><span style="font-size:20px;width:20px;text-align:center">+</span>“${esc(qv)}” etiketini oluştur</button>`:'')+
+      list.map(t=>`<button type="button" data-tg="${esc(t)}" class="${tags.includes(t)?'on':''}">${LBL}${esc(t)}<span class="bx"></span></button>`).join('')};
+  const pickOpen=()=>!$('#pick').classList.contains('hid');
+  const showPick=v=>{$('#pick').classList.toggle('hid',!v);if(v){$('#tagq').value='';drawPick();$('#tagq').focus()}};
+  drawTags();$('#tagq').oninput=drawPick;
+  $('#tagq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();const v=$('#tagq').value.trim();if(v){const ex=allTags().find(t=>t.toLocaleLowerCase('tr')===v.toLocaleLowerCase('tr'))||v;if(!tags.includes(ex))tags.push(ex);$('#tagq').value='';drawTags();drawPick()}}};
+  sheetBack=()=>{if(pickOpen()){showPick(false);return true}return false};
   $('#secSel').onchange=e=>{const n=e.target.value==='__new';$('#newSec').style.display=n?'':'none';if(n)$('#newSec').focus()};
   sh.onclick=e=>{const b=e.target.closest('button');if(!b)return;
     if(b.hasAttribute('data-close'))return close();
+    if(b.hasAttribute('data-addtag')){showPick(!pickOpen());return}
+    if(b.dataset.rmtag!=null){tags=tags.filter(t=>t!==b.dataset.rmtag);drawTags();if(pickOpen())drawPick();return}
+    if(b.dataset.tg!=null){const t=b.dataset.tg;tags=tags.includes(t)?tags.filter(x=>x!==t):[...tags,t];drawTags();drawPick();return}
+    if(b.dataset.newtag!=null){const t=b.dataset.newtag;if(!S.tags.includes(t))S.tags.push(t);if(!tags.includes(t))tags.push(t);$('#tagq').value='';drawTags();drawPick();return}
     if(b.dataset.st){const i=f.qty;i.value=Math.max(0,(+i.value||0)+ +b.dataset.st)}
     if(b.closest('#seg')){fill=+b.dataset.v;[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x===b))}
     if(b.dataset.o){const k=b.dataset.o;opt[k]=!opt[k];b.classList.toggle('on',opt[k]);$('#o-'+k).classList.toggle('hid',!opt[k])}
@@ -404,15 +440,16 @@ function editSheet(it){
     let sec=d.get('section');
     if(sec==='__new'){sec=(d.get('newsec')||'').trim();if(!sec){toast('Yeni kategorinin adını yaz');$('#newSec').focus();return}if(!S.sections.includes(sec))S.sections.push(sec)}
     Object.assign(it,{name:d.get('name').trim(),brand:d.get('brand').trim(),loc:d.get('loc').trim(),section:sec,amount:d.get('amount').trim(),
-      qty:opt.qty?Math.max(0,parseInt(d.get('qty'))||0):null,fill:opt.fill?fill:null,exp:opt.exp?(d.get('exp')||''):'',war:opt.war?(d.get('war')||''):'',note:d.get('note').trim()});
+      qty:opt.qty?Math.max(0,parseInt(d.get('qty'))||0):null,fill:opt.fill?fill:null,exp:opt.exp?(d.get('exp')||''):'',war:opt.war?(d.get('war')||''):'',note:d.get('note').trim(),tags});
+    tags.forEach(t=>{if(!S.tags.includes(t))S.tags.push(t)});
     if(!it.name)return;if(isNew)S.items.push(it);save();close();render();toast(isNew?'Eklendi':'Kaydedildi')};
   if(isNew)setTimeout(()=>f.name.focus(),50);
 }
 
 /* CSV */
-const COLS=[['name','Ürün'],['brand','Marka'],['section','Kategori'],['loc','Konum'],['qty','Adet'],['amount','Miktar'],['fill','Doluluk'],['exp','Son Kullanma'],['war','Garanti'],['note','Not']];
+const COLS=[['name','Ürün'],['brand','Marka'],['section','Kategori'],['loc','Konum'],['qty','Adet'],['amount','Miktar'],['fill','Doluluk'],['exp','Son Kullanma'],['war','Garanti'],['tags','Etiketler'],['note','Not']];
 function toCSV(){const c=v=>{v=v==null?'':String(v);return/[;"\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
-  return'﻿'+[COLS.map(x=>x[1]).join(';'),...S.items.map(it=>COLS.map(([k])=>c(it[k])).join(';'))].join('\r\n')}
+  return'﻿'+[COLS.map(x=>x[1]).join(';'),...S.items.map(it=>COLS.map(([k])=>c(k==='tags'?(it.tags||[]).join(', '):it[k])).join(';'))].join('\r\n')}
 function parseCSV(txt){
   txt=txt.replace(/^﻿/,'');const first=txt.split('\n')[0],sep=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';
   const rows=[];let r=[],c='',qd=false;
@@ -427,7 +464,7 @@ function csvItems(txt){
   const rows=parseCSV(txt);if(rows.length<2)return[];
   const h=rows.shift().map(x=>x.trim().toLocaleLowerCase('tr'));
   const col=(...ns)=>h.findIndex(x=>ns.some(n=>x.startsWith(n)));
-  const ix={n:col('ürün','urun','name'),b:col('marka'),s:col('kategori','bölüm'),l:col('konum'),q:col('adet'),a:col('miktar','menge'),f:col('doluluk'),e:col('son'),w:col('garanti'),o:col('not'),u:col('kullan'),t:col('tür')};
+  const ix={n:col('ürün','urun','name'),b:col('marka'),s:col('kategori','bölüm'),l:col('konum'),q:col('adet'),a:col('miktar','menge'),f:col('doluluk'),e:col('son'),w:col('garanti'),o:col('not'),u:col('kullan'),t:col('tür'),g:col('etiket')};
   const dt=v=>{v=(v||'').trim();const m=v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);return m?`${m[3]}-${pad(m[2])}-${pad(m[1])}`:/^\d{4}-\d{2}-\d{2}$/.test(v)?v:''};
   const now=Date.now();
   return rows.map((r,i)=>{const g=k=>ix[k]<0?'':(r[ix[k]]||'').trim();if(!g('n'))return null;
@@ -436,7 +473,7 @@ function csvItems(txt){
     let fill;if(ix.f>=0){const v=g('f');fill=v===''?null:Math.min(100,Math.max(0,Math.round(parseFloat(v)/25)*25))}else fill=eq?null:100;
     if(Number.isNaN(fill))fill=null;
     return{id:uid(),name:g('n'),brand:g('b'),section:g('s')||(view!=='Tümü'&&view!=='__alert'?view:S.sections[0]),loc:g('l'),qty:/^\d+$/.test(qty)?+qty:null,amount,fill,
-      exp:dt(g('e')),war:dt(g('w')),note:[g('u'),g('o')].filter(Boolean).join(' · '),cat:'',type:eq?'Ekipman':'Sarf',added:now+i}}).filter(Boolean);
+      exp:dt(g('e')),war:dt(g('w')),note:[g('u'),g('o')].filter(Boolean).join(' · '),cat:'',type:eq?'Ekipman':'Sarf',tags:g('g')?g('g').split(',').map(x=>x.trim()).filter(Boolean):[],added:now+i}}).filter(Boolean);
 }
 async function writeFile(name,data){
   try{await FS.writeFile({path:'Download/Kiler/'+name,data,directory:'EXTERNAL_STORAGE',encoding:'utf8',recursive:true});return'İndirilenler › Kiler'}
@@ -481,6 +518,8 @@ function menuSheet(){
     <section><h3>Kategoriler</h3><p>Boş kategoriler × ile silinebilir.</p>
       <div class="catl">${S.sections.map(s=>`<span>${esc(s)}${used(s)?'':`<button data-delcat="${esc(s)}" aria-label="${esc(s)} sil">×</button>`}</span>`).join('')}</div>
       <div class="line" style="margin-top:8px"><input id="ns" class="inp" style="flex:1;width:auto" placeholder="Yeni kategori adı"><button class="btn" data-addsec>Ekle</button></div></section>
+    <section><h3>Etiketler</h3>${allTags().length?`<p>× ile silinen etiket bütün ürünlerden kaldırılır.</p><div class="catl">${allTags().map(t=>`<span>${esc(t)}<button data-deltag="${esc(t)}" aria-label="${esc(t)} sil">×</button></span>`).join('')}</div>`:'<p>Henüz etiket yok. Ürün düzenlerken “+ Etiket” ile ekleyebilirsin.</p>'}</section>
+    ${S.items.some(isSample)?`<section><h3>Örnek ürünler</h3><p>Başlangıçta deneme için eklenen ${S.items.filter(isSample).length} örnek ürün (Raf 1, Kutu 2… konumları bunlardan geliyor).</p><button class="btn del" data-delex>Örnek ürünleri sil</button></section>`:''}
     ${isNative?`<section><h3>Bildirimler</h3><p>Tarihler yaklaşınca saat 09:00’da bildirim gelir.</p><button class="btn" data-ntest>Bildirimi dene (5 sn)</button></section>`:''}
     <section><h3>Uyarı süreleri</h3>
       <div class="line"><span style="flex:1;font-size:14px">Son kullanma tarihine kaç gün kala</span><input type="number" id="wd" min="1" max="90" value="${S.warn}"></div>
@@ -504,6 +543,9 @@ function menuSheet(){
     if(b.hasAttribute('data-bk')){if(!FS){const t=$('#csvOut');t.value=toCSV().slice(1);t.classList.remove('hid');try{await navigator.clipboard.writeText(t.value);toast('CSV metni kopyalandı')}catch(err){t.select();toast('Metni seçip kopyala')}return}
       try{const w=await backupNow(false);toast('Kaydedildi: '+w);menuSheet()}catch(err){toast('Kaydedilemedi: '+(err.message||err))}return}
     if(b.dataset.fq){S.backup.freq=b.dataset.fq;store();menuSheet();if(b.dataset.fq!=='off')autoBackup();return}
+    if(b.dataset.deltag){const t=b.dataset.deltag;S.tags=S.tags.filter(x=>x!==t);S.items.forEach(i=>i.tags=(i.tags||[]).filter(x=>x!==t));save();render();menuSheet();toast('“'+t+'” etiketi silindi');return}
+    if(b.hasAttribute('data-delex')){if(!b.classList.contains('sure')){b.classList.add('sure');b.textContent='Emin misin? Sil';return}
+      lastDel=[];S.items.forEach((it,i)=>{if(isSample(it))lastDel.push({it,i})});S.items=S.items.filter(i=>!isSample(i));save();close();render();toast(lastDel.length+' örnek ürün silindi',true);return}
     if(b.dataset.delcat){S.sections=S.sections.filter(s=>s!==b.dataset.delcat);if(view===b.dataset.delcat)view='Tümü';store();render();menuSheet();return}
     if(b.hasAttribute('data-addsec')){const v=$('#ns').value.trim();if(v&&!S.sections.includes(v)){S.sections.push(v);store();render();menuSheet();toast('Kategori eklendi')}return}
     if(b.hasAttribute('data-ntest')){try{const r=await LN.requestPermissions();if(r.display!=='granted'){toast('Bildirim izni verilmedi');return}
@@ -514,10 +556,11 @@ function menuSheet(){
 }
 
 /* toplu işlem */
-const BF=[['section','Kategori','section'],['loc','Konum','text'],['brand','Marka','text'],['fill','Doluluk','fill'],['exp','Son kullanma tarihi','date'],['war','Garanti bitiş tarihi','date'],['amount','Miktar','text'],['qty','Adet','num'],['note','Not','text']];
+const BF=[['section','Kategori','section'],['loc','Konum','text'],['brand','Marka','text'],['fill','Doluluk','fill'],['exp','Son kullanma tarihi','date'],['war','Garanti bitiş tarihi','date'],['amount','Miktar','text'],['qty','Adet','num'],['note','Not','text'],['tags+','Etiket ekle','tag'],['tags-','Etiket kaldır','tag']];
 function bulkSheet(){
   let fk='loc',fv=100;
   const ctl=()=>{const [k,,t]=BF.find(f=>f[0]===fk);const opts=[...new Set(S.items.map(i=>i[k]).filter(Boolean))].sort(cmpTr);
+    if(t==='tag')return`<input id="bv" list="bdl" placeholder="Etiket adı"><datalist id="bdl">${allTags().map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`;
     if(t==='section')return`<select id="bv">${S.sections.map(x=>`<option>${esc(x)}</option>`).join('')}</select>`;
     if(t==='fill'){fv=100;return`<div class="seg" id="bseg">${[['Takip yok',null],['%0',0],['%25',25],['%50',50],['%75',75],['%100',100]].map(([l,v])=>`<button type="button" data-v="${v}" class="${v===100?'on':''}">${l}</button>`).join('')}</div>`}
     if(t==='date')return`<input id="bv" type="date"><span style="font-size:12px">Boş bırakırsan tarih kaldırılır.</span>`;
@@ -529,7 +572,8 @@ function bulkSheet(){
     $('#bk').onchange=e=>{fk=e.target.value;draw()};
     $('#bf').onsubmit=e=>{e.preventDefault();const t=BF.find(f=>f[0]===fk)[2];let v;
       if(t==='fill')v=fv;else{v=$('#bv').value;if(t==='num')v=v.trim()===''?null:Math.max(0,parseInt(v)||0);else v=v.trim()}
-      S.items.forEach(it=>{if(sel.has(it.id))it[fk]=v});const n=sel.size;sel.clear();save();close();render();toast(n+' ürün güncellendi')};
+      if(t==='tag'){if(!v){toast('Etiket adı yaz');return}S.items.forEach(it=>{if(!sel.has(it.id))return;it.tags=it.tags||[];if(fk==='tags+'){if(!it.tags.includes(v))it.tags.push(v)}else it.tags=it.tags.filter(x=>x!==v)});if(fk==='tags+'&&!S.tags.includes(v))S.tags.push(v)}
+      else S.items.forEach(it=>{if(sel.has(it.id))it[fk]=v});const n=sel.size;sel.clear();save();close();render();toast(n+' ürün güncellendi')};
     sh.onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-close'))return close();
       if(b.closest('#bseg')){fv=b.dataset.v==='null'?null:+b.dataset.v;[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x===b))}}};
   draw();
@@ -563,7 +607,7 @@ list.addEventListener('contextmenu',e=>{if(e.target.closest('.card'))e.preventDe
 list.addEventListener('change',e=>{const c=e.target;if(!c.classList.contains('ck'))return;
   if(c.hasAttribute('data-ckall'))visIds.forEach(id=>c.checked?sel.add(id):sel.delete(id));else c.checked?sel.add(c.dataset.ck):sel.delete(c.dataset.ck);render()});
 list.onclick=e=>{
-  if(e.target.closest('[data-clearf]')){fStatus='all';fLoc.clear();fCat.clear();render();return}
+  if(e.target.closest('[data-clearf]')){fStatus='all';fLoc.clear();fCat.clear();fTag.clear();render();return}
   const h=e.target.closest('[data-sort]');if(h){const k=h.dataset.sort;if(sortK===k)sortD=-sortD;else{sortK=k;sortD=1}remember();render();return}
   if(e.target.closest('.ckw'))return;
   const r=e.target.closest('[data-id]');if(!r)return;const it=S.items.find(x=>x.id===r.dataset.id);if(!it)return;
@@ -575,7 +619,7 @@ list.onclick=e=>{
 
 /* geri tuşu: pencere açıksa kapat, seçim varsa kaldır, kategori seçiliyse Tümü'ye dön, ana ekrandaysa çık */
 function goBack(){
-  if(isOpen()){close();return true}
+  if(isOpen()){if(sheetBack&&sheetBack())return true;close();return true}
   if(sel.size){sel.clear();render();return true}
   if(view!=='Tümü'){view='Tümü';render();return true}
   return false;
