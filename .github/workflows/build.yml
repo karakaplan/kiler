@@ -33,7 +33,7 @@ jobs:
 
       - name: Simge ve açılış ekranı
         continue-on-error: true
-        run: npx capacitor-assets generate --android --iconBackgroundColor '#c9a46a' --splashBackgroundColor '#c9a46a'
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#303236' --splashBackgroundColor '#1f2022' --splashBackgroundColorDark '#1f2022'
 
       - name: Sürüm numarası
         run: |
