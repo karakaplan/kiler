@@ -12,6 +12,7 @@
    LAYOUT: sabit üst bant + arama/sırala/filtre + kategori çipleri, kartlar, sağ altta + */
 :root{color-scheme:dark;--bg:#1f2022;--card:#303236;--ink:#eeeeec;--mute:#a3a5a8;--line:#3d3f44;--kraft:#c9a46a;--kraft2:#b48d52;--onk:#1b1a17;--warn:#ff8a4c;--bad:#ff6b6b;--ok:#86c97f;--seg:#eeeeec;--segoff:#4c4e54;--chip:#3a3c41}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html{overflow-anchor:none}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -117,6 +118,20 @@ body.selecting .fab{display:none}
 .rad button.on{background:var(--chip);font-weight:650}
 .rad button span{font-size:13px;color:var(--mute)}
 .hid{display:none!important}
+/* kaydırınca küçülen üst bölüm */
+header,.top h1,.top .sum,.icon,.icon svg,.search,.search input,.chips,.chips button{transition:all .22s ease}
+body.compact header{padding-top:max(6px,env(safe-area-inset-top));padding-bottom:6px}
+body.compact .top h1{font-size:18px}
+body.compact .top .sum{font-size:11px}
+body.compact .icon{width:32px;height:32px;border-radius:8px}
+body.compact .icon svg{width:17px;height:17px}
+body.compact .icon .dot{top:4px;right:4px;width:7px;height:7px}
+body.compact .search{margin-top:6px}
+body.compact .search input{height:32px;font-size:14px;border-radius:8px}
+body.compact .chips{padding:6px 14px}
+body.compact .chips button{height:26px;font-size:12px;padding:0 10px}
+body.compact .chips .alert b{min-width:16px;line-height:16px;font-size:10px}
+@media(prefers-reduced-motion:reduce){header,.top h1,.top .sum,.icon,.icon svg,.search,.search input,.chips,.chips button{transition:none}}
 .tag.lb{background:none;border:1px solid var(--line);color:var(--ink)}
 .tagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tagrow .tg{display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 4px 0 12px;border-radius:8px;background:var(--chip);color:var(--ink);font-size:14px}
@@ -627,6 +642,10 @@ function goBack(){
 if(APP){APP.addListener('backButton',()=>{if(!goBack())APP.exitApp()});APP.addListener('resume',()=>{render();autoBackup()})}
 
 new ResizeObserver(()=>document.documentElement.style.setProperty('--hh',$('#hd').offsetHeight+'px')).observe($('#hd'));
+{let lastY=scrollY,up=0,hold=0;const setC=v=>{if(document.body.classList.contains('compact')!==v){document.body.classList.toggle('compact',v);hold=Date.now()+320}};
+  addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(Date.now()<hold)return;
+    if(y<24){up=0;setC(false);return}
+    if(dy>0){up=0;if(y>70)setC(true)}else{up+=dy;if(up<-40)setC(false)}},{passive:true})}
 render();
 if(isNative){
   (async()=>{try{if(!hadLocal&&PR){const r=await PR.get({key:KEY});if(r&&r.value){const d=JSON.parse(r.value);if(d&&Array.isArray(d.items)){S=migrate(d);try{localStorage.setItem(KEY,r.value)}catch(e){}render()}}}}catch(e){}
