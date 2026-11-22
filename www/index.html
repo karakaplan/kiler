@@ -48,8 +48,9 @@ main{padding:10px 12px 110px;max-width:1100px;margin:0 auto}
 .selc{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center}
 .card.sel .selc{background:var(--kraft2);border-color:var(--kraft2)}
 .card.sel .selc::after{content:'';width:10px;height:6px;border:2.5px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
-.qty{display:flex;align-items:center;gap:6px;flex:none}
-.qty button{width:30px;height:30px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:17px;line-height:1;display:grid;place-items:center}
+.qty{display:flex;align-items:center;gap:8px;flex:none}
+.qty button{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--mute);background:none;color:var(--mute);font-size:14px;line-height:1;display:grid;place-items:center;padding:0;position:relative}
+.qty button::after{content:'';position:absolute;inset:-10px}
 .qty button:disabled{opacity:.3}
 .qty span{min-width:26px;text-align:center;font-size:15px;font-weight:650;font-variant-numeric:tabular-nums}
 .fill{flex:none;display:flex;gap:2px;align-items:flex-end;border:0;background:none;padding:10px 4px;height:44px}
