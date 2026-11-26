@@ -8,43 +8,47 @@
 /* VOICE: sakin, işe odaklı; telefonda tek elle kullanılan bir depo defteri
    IDEA: koli etiketi — kraft karton bant, siyah etiket yazısı
    PICTURE: uygulamanın kendisi; kart listesi ilk ekranda
-   COLOUR and TYPE: kraft bant (değiştirilebilir), koyu gri zemin, antrasit kartlar, uyarı turuncu/kırmızı; sistem yazı tipi
+   COLOUR and TYPE: koyu gri zemin, antrasit kartlar, petrol yeşili vurgu (değiştirilebilir), uyarı turuncu/kırmızı; sistem yazı tipi
    LAYOUT: sabit üst bant + arama/sırala/filtre + kategori çipleri, kartlar, sağ altta + */
-:root{color-scheme:dark;--bg:#1f2022;--card:#303236;--ink:#eeeeec;--mute:#a3a5a8;--line:#3d3f44;--kraft:#c9a46a;--kraft2:#b48d52;--onk:#1b1a17;--warn:#ff8a4c;--bad:#ff6b6b;--ok:#86c97f;--seg:#eeeeec;--segoff:#4c4e54;--chip:#3a3c41}
+:root{color-scheme:dark;--bg:#1f2022;--card:#303236;--ink:#eeeeec;--mute:#a3a5a8;--line:#3d3f44;--kraft:#35a690;--kraft2:#35a690;--onk:#0f1f1c;--warn:#ff8a4c;--bad:#ff6b6b;--ok:#86c97f;--seg:#eeeeec;--segoff:#4c4e54;--chip:#3a3c41}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
 html{overflow-anchor:none}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--kraft2);outline-offset:2px}
-header{position:sticky;top:0;z-index:5;background:var(--kraft);color:var(--onk);padding:max(12px,env(safe-area-inset-top)) 14px 10px;box-shadow:0 1px 0 rgba(0,0,0,.15)}
-.top{display:flex;align-items:center;gap:8px}
-.top h1{margin:0;font-size:26px;line-height:1.05;letter-spacing:-.01em}
-.top .sum{font-size:13px;opacity:.8;margin-inline-start:2px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);color:var(--ink);padding:max(8px,env(safe-area-inset-top)) 8px 2px 16px}
+.top{display:flex;align-items:center;gap:2px;min-height:48px}
+.ttl{display:flex;flex-direction:column;line-height:1.1}
+.top h1{margin:0;font-size:20px;line-height:1.1;letter-spacing:-.01em;font-weight:700}
+.top .sum{font-size:12px;color:var(--kraft);margin-top:2px}
 .top .sp{flex:1}
-.icon{width:44px;height:44px;border:0;border-radius:10px;background:rgba(0,0,0,.1);color:inherit;display:grid;place-items:center;position:relative;flex:none}
+.icon{width:40px;height:40px;border:0;border-radius:10px;background:none;color:var(--mute);display:grid;place-items:center;position:relative;flex:none}
 .icon svg{width:22px;height:22px}
-.icon .dot{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid var(--kraft)}
-.search{margin-top:10px;display:flex;gap:8px}
-.search input{flex:1;height:44px;border:0;border-radius:10px;padding:0 12px;background:rgba(255,255,255,.8);color:#1b1a17;font-size:16px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 14px;scrollbar-width:none;background:var(--bg);position:sticky;top:var(--hh,118px);z-index:4;border-bottom:1px solid var(--line)}
+.icon .dot{position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--kraft)}
+.icon.on{color:var(--kraft)}
+.search{margin:4px 8px 6px 0;display:none}
+.search.open{display:flex}
+.search input{flex:1;height:40px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--ink);font-size:15px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 12px 8px;scrollbar-width:none;background:var(--bg);position:sticky;top:var(--hh,60px);z-index:4}
 .chips::-webkit-scrollbar{display:none}
-.chips button{flex:none;height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line);background:var(--chip);font-size:14px;white-space:nowrap}
-.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.chips .alert b{display:inline-block;min-width:20px;padding:0 6px;margin-inline-start:6px;border-radius:10px;background:var(--warn);color:#fff;font-size:12px;line-height:20px;text-align:center}
-main{padding:10px 12px 110px;max-width:1100px;margin:0 auto}
-.info{font-size:13px;color:var(--mute);margin:2px 4px 10px;display:flex;justify-content:space-between;gap:8px}
+.chips button{flex:none;height:32px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--mute);font-size:13px;white-space:nowrap}
+.chips button i{font-style:normal;opacity:.8}
+.chips button.on{background:color-mix(in srgb,var(--kraft) 22%,var(--bg));color:var(--kraft);border-color:color-mix(in srgb,var(--kraft) 55%,var(--bg))}
+.chips .alert b{display:inline-block;min-width:18px;padding:0 5px;margin-inline-start:6px;border-radius:9px;background:var(--warn);color:#fff;font-size:11px;line-height:18px;text-align:center}
+main{padding:4px 10px 110px;max-width:1100px;margin:0 auto}
+.info{font-size:12px;color:var(--mute);margin:0 4px 6px;display:flex;justify-content:space-between;gap:8px}
 .info button{border:0;background:none;color:var(--kraft2);font-size:13px;font-weight:600;padding:0}
 /* kartlar */
-.cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px 16px;display:flex;gap:10px;align-items:center;user-select:none;-webkit-user-select:none;position:relative}
+.cards{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 10px 14px;display:flex;gap:8px;align-items:center;user-select:none;-webkit-user-select:none;position:relative}
 .card.sel{border-color:var(--kraft2);box-shadow:0 0 0 2px var(--kraft2) inset}
 .card .body{flex:1;cursor:pointer}
-.card .nm{font-size:17px;font-weight:650;line-height:1.25}
-.card .sub{font-size:13px;color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.card .nm{font-size:16px;font-weight:650;line-height:1.25}
+.card .sub{font-size:12.5px;color:var(--mute);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .card .tags:empty{display:none}
-.tag{font-size:12px;line-height:1;padding:6px 9px;border-radius:8px;background:var(--chip);color:var(--mute);white-space:nowrap}
+.tag{font-size:11px;line-height:1;padding:4px 7px;border-radius:6px;background:var(--chip);color:var(--mute);white-space:nowrap}
 .tag.soon{background:var(--warn);color:#fff}.tag.bad{background:var(--bad);color:#fff}.tag.ok{background:color-mix(in srgb,var(--ok) 18%,var(--card));color:var(--ok)}
 .selc{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center}
 .card.sel .selc{background:var(--kraft2);border-color:var(--kraft2)}
@@ -60,7 +64,7 @@ main{padding:10px 12px 110px;max-width:1100px;margin:0 auto}
 .fill i.on{background:var(--seg)}
 .fill.low i.on{background:var(--warn)}
 .fill.zero i{background:none;outline:1.5px solid var(--bad);outline-offset:-1.5px}
-.card .fill{padding:10px 6px;height:52px}
+.card .fill{padding:6px 6px;height:44px}
 .card .fill i{width:8px}.card .fill i:nth-child(1){height:11px}.card .fill i:nth-child(2){height:16px}.card .fill i:nth-child(3){height:21px}.card .fill i:nth-child(4){height:26px}
 .empty{padding:40px 16px;text-align:center;color:var(--mute)}
 /* tablo */
@@ -82,7 +86,7 @@ tr.sel td{background:color-mix(in srgb,var(--kraft) 16%,var(--card))}
 .dt{font-size:12px;padding:2px 7px;border-radius:6px;background:var(--chip);color:var(--mute);white-space:nowrap}
 .dt.soon{background:var(--warn);color:#fff}.dt.past{background:var(--bad);color:#fff}.dt+.dt{margin-inline-start:4px}
 /* genel */
-.fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:16px;border:0;background:var(--ink);color:var(--bg);font-size:30px;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:6}
+.fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:16px;border:0;background:var(--kraft);color:var(--onk);font-size:30px;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:6}
 body.selecting .fab{display:none}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:none;align-items:flex-end;justify-content:center}
 .ov.open{display:flex}
@@ -118,20 +122,6 @@ body.selecting .fab{display:none}
 .rad button.on{background:var(--chip);font-weight:650}
 .rad button span{font-size:13px;color:var(--mute)}
 .hid{display:none!important}
-/* kaydırınca küçülen üst bölüm */
-header,.top h1,.top .sum,.icon,.icon svg,.search,.search input,.chips,.chips button{transition:all .22s ease}
-body.compact header{padding-top:max(6px,env(safe-area-inset-top));padding-bottom:6px}
-body.compact .top h1{font-size:18px}
-body.compact .top .sum{font-size:11px}
-body.compact .icon{width:32px;height:32px;border-radius:8px}
-body.compact .icon svg{width:17px;height:17px}
-body.compact .icon .dot{top:4px;right:4px;width:7px;height:7px}
-body.compact .search{margin-top:6px}
-body.compact .search input{height:32px;font-size:14px;border-radius:8px}
-body.compact .chips{padding:6px 14px}
-body.compact .chips button{height:26px;font-size:12px;padding:0 10px}
-body.compact .chips .alert b{min-width:16px;line-height:16px;font-size:10px}
-@media(prefers-reduced-motion:reduce){header,.top h1,.top .sum,.icon,.icon svg,.search,.search input,.chips,.chips button{transition:none}}
 .tag.lb{background:none;border:1px solid var(--line);color:var(--ink)}
 .tagrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .tagrow .tg{display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 4px 0 12px;border-radius:8px;background:var(--chip);color:var(--ink);font-size:14px}
@@ -171,14 +161,15 @@ body.compact .chips .alert b{min-width:16px;line-height:16px;font-size:10px}
 <body>
 <header id="hd">
   <div class="top">
-    <h1 id="appName">Shelfetto</h1><span class="sum" id="sum"></span><span class="sp"></span>
+    <div class="ttl"><h1 id="appName">Shelfetto</h1><span class="sum" id="sum"></span></div><span class="sp"></span>
+    <button class="icon" id="searchBtn" aria-label="Ara"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
+    <button class="icon" id="filterBtn" aria-label="Filtrele"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></button>
+    <button class="icon" id="sortBtn" aria-label="Sırala"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"/></svg></button>
     <button class="icon" id="modeBtn" aria-label="Görünümü değiştir"></button>
     <button class="icon" id="menuBtn" aria-label="Menü"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
   </div>
-  <div class="search">
-    <input id="q" type="search" placeholder="Ara: ürün, marka, konum, not…" autocomplete="off">
-    <button class="icon" id="sortBtn" aria-label="Sırala"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4"/></svg></button>
-    <button class="icon" id="filterBtn" aria-label="Filtrele"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></button>
+  <div class="search" id="searchRow">
+    <input id="q" type="search" placeholder="Ara: ürün, marka, konum, etiket, not…" autocomplete="off">
   </div>
 </header>
 <nav class="chips" id="chips"></nav>
@@ -244,7 +235,7 @@ function migrate(d){
     if(it.added==null)it.added=i;if(!Array.isArray(it.tags))it.tags=[];
     if(!d.sections.includes(it.section))d.sections.push(it.section);
   });
-  if(!d.backup)d.backup={freq:'weekly',last:''};if(!d.tags)d.tags=[];if(d.appName==='Kiler')d.appName='';
+  if(!d.backup)d.backup={freq:'weekly',last:''};if(!d.tags)d.tags=[];if(d.appName==='Kiler')d.appName='';if(d.color==='#c9a46a')d.color='';
   d.v=5;d.notesV=1;return d;
 }
 function load(){try{const r=localStorage.getItem(KEY);if(r){hadLocal=true;const d=JSON.parse(r);if(d&&Array.isArray(d.items))return migrate(d)}}catch(e){}return seed()}
@@ -293,7 +284,8 @@ function cmp(a,b){const va=sortVal(a,sortK),vb=sortVal(b,sortK);const ea=va===''
 
 function chips(){
   const n=S.items.filter(isAlert).length;
-  $('#chips').innerHTML=['Tümü',...S.sections].map(s=>`<button data-v="${esc(s)}" class="${view===s?'on':''}">${esc(s)}</button>`).join('')+
+  const cnt=s=>s==='Tümü'?S.items.length:S.items.filter(i=>i.section===s).length;
+  $('#chips').innerHTML=['Tümü',...S.sections].map(s=>`<button data-v="${esc(s)}" class="${view===s?'on':''}">${esc(s)} <i>(${cnt(s)})</i></button>`).join('')+
     `<button data-v="__alert" class="alert ${view==='__alert'?'on':''}">Dikkat${n?`<b>${n}</b>`:''}</button>`;
 }
 function tagsHtml(it){
@@ -324,7 +316,7 @@ function dateBadge(it){
 }
 const ICON_TABLE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>';
 const ICON_CARDS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3.5" width="18" height="7" rx="2"/><rect x="3" y="13.5" width="18" height="7" rx="2"/></svg>';
-const COLORS=['#c9a46a','#8a9a5b','#2a9d8f','#4a6fa5','#7b6bb0','#c8553d','#d4a017','#8d8d8d','#2b2b2b'];
+const COLORS=['#35a690','#c9a46a','#8a9a5b','#4a8fd6','#8b7bd0','#d97757','#d4a017','#9a9a9a','#e05a7a'];
 function lum(h){const n=parseInt(h.slice(1),16),r=(n>>16&255)/255,g=(n>>8&255)/255,b=(n&255)/255;const f=c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4;return .2126*f(r)+.7152*f(g)+.0722*f(b)}
 function applyLook(){const r=document.documentElement.style;const c=S.color;
   if(c){r.setProperty('--kraft',c);r.setProperty('--kraft2',c);r.setProperty('--onk',lum(c)>.35?'#1b1a17':'#ffffff')}else{['--kraft','--kraft2','--onk'].forEach(v=>r.removeProperty(v))}
@@ -339,7 +331,7 @@ function visible(){pruneFilters();
 function render(){
   chips();applyLook();
   const mb=$('#modeBtn');mb.innerHTML=mode==='table'?ICON_CARDS:ICON_TABLE;mb.setAttribute('aria-label',mode==='table'?'Kart görünümüne geç':'Tablo görünümüne geç');
-  $('#filterBtn').innerHTML=$('#filterBtn').innerHTML.replace(/<span class="dot"><\/span>/,'')+(filterCount()?'<span class="dot"></span>':'');
+  $('#filterBtn').innerHTML=$('#filterBtn').innerHTML.replace(/<span class="dot"><\/span>/,'')+(filterCount()?'<span class="dot"></span>':'');$('#filterBtn').classList.toggle('on',filterCount()>0);$('#searchBtn').classList.toggle('on',!!q);
   const L=visible();visIds=L.map(i=>i.id);
   const sl=SORTS.find(s=>s[0]===sortK)||SORTS[0];
   let html=`<div class="info"><span>${L.length} ürün · ${sl[1].replace(' göre','')} (${sortD>0?sl[2]:sl[3]})</span>${filterCount()?`<button data-clearf>Filtreyi temizle</button>`:''}</div>`;
@@ -541,7 +533,7 @@ function menuSheet(){
       <div class="line" style="margin-top:8px"><span style="flex:1;font-size:14px">Garanti bitişine kaç gün kala</span><input type="number" id="ww" min="1" max="365" value="${wwarn()}"></div></section>
     <section><h3>Görünüm</h3><p>Uygulama adı</p>
       <input id="an" class="inp" value="${esc(S.appName||document.title||'Shelfetto')}">
-      <p style="margin-top:10px">Üst bar rengi</p>
+      <p style="margin-top:10px">Vurgu rengi</p>
       <div class="line" id="sw">${COLORS.map(c=>`<button class="swc" data-c="${c}" aria-label="Renk ${c}" style="background:${c};${(S.color||COLORS[0])===c?'outline:3px solid var(--ink);outline-offset:2px':''}"></button>`).join('')}
         <label class="swc cust" aria-label="Özel renk"><input type="color" id="cc" value="${S.color||COLORS[0]}"></label></div></section>
     <section><h3>Sıfırla</h3><p>Her şeyi siler ve başlangıçtaki örnek listeyi yükler.</p><button class="btn del" data-reset>Sıfırla</button></section>
@@ -602,6 +594,9 @@ $('#tbtn').onclick=()=>{if(lastDel){lastDel.slice().sort((a,b)=>a.i-b.i).forEach
 /* olaylar */
 $('#chips').onclick=e=>{const b=e.target.closest('button');if(!b)return;view=b.dataset.v;sel.clear();render();window.scrollTo(0,0)};
 $('#q').oninput=e=>{q=e.target.value.trim();render()};
+const searchOpen=()=>$('#searchRow').classList.contains('open');
+function setSearch(v){$('#searchRow').classList.toggle('open',v);if(v)$('#q').focus();else{$('#q').value='';q='';$('#q').blur();render()}}
+$('#searchBtn').onclick=()=>setSearch(!searchOpen());
 $('#sortBtn').onclick=sortSheet;
 $('#filterBtn').onclick=filterSheet;
 $('#add').onclick=()=>editSheet(null);
@@ -636,16 +631,13 @@ list.onclick=e=>{
 function goBack(){
   if(isOpen()){if(sheetBack&&sheetBack())return true;close();return true}
   if(sel.size){sel.clear();render();return true}
+  if(searchOpen()){setSearch(false);return true}
   if(view!=='Tümü'){view='Tümü';render();return true}
   return false;
 }
 if(APP){APP.addListener('backButton',()=>{if(!goBack())APP.exitApp()});APP.addListener('resume',()=>{render();autoBackup()})}
 
 new ResizeObserver(()=>document.documentElement.style.setProperty('--hh',$('#hd').offsetHeight+'px')).observe($('#hd'));
-{let lastY=scrollY,up=0,hold=0;const setC=v=>{if(document.body.classList.contains('compact')!==v){document.body.classList.toggle('compact',v);hold=Date.now()+320}};
-  addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(Date.now()<hold)return;
-    if(y<24){up=0;setC(false);return}
-    if(dy>0){up=0;if(y>70)setC(true)}else{up+=dy;if(up<-40)setC(false)}},{passive:true})}
 render();
 if(isNative){
   (async()=>{try{if(!hadLocal&&PR){const r=await PR.get({key:KEY});if(r&&r.value){const d=JSON.parse(r.value);if(d&&Array.isArray(d.items)){S=migrate(d);try{localStorage.setItem(KEY,r.value)}catch(e){}render()}}}}catch(e){}

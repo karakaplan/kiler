@@ -33,7 +33,7 @@ jobs:
 
       - name: Simge ve açılış ekranı
         continue-on-error: true
-        run: npx capacitor-assets generate --android --iconBackgroundColor '#F0EBE3' --splashBackgroundColor '#1f2022' --splashBackgroundColorDark '#1f2022'
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#285C54' --splashBackgroundColor '#1f2022' --splashBackgroundColorDark '#1f2022'
 
       - name: Kendi ikon dosyalarımızı uygula
         run: cp -r res-overlay/* android/app/src/main/res/
